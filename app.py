@@ -181,7 +181,7 @@ CSS = """
 #title-row {border-bottom: 1px solid #eee; padding-bottom: 10px;}
 """
 
-with gr.Blocks(title="OpenShift Virt Migration Advisor", css=CSS) as demo:
+with gr.Blocks(title="OpenShift Virt Migration Advisor") as demo:
     with gr.Row(elem_id="title-row"):
         gr.Markdown(
             "# 🛰️ OpenShift Virtualization Migration Advisor\n"
@@ -249,4 +249,5 @@ with gr.Blocks(title="OpenShift Virt Migration Advisor", css=CSS) as demo:
 
 
 if __name__ == "__main__":
-    demo.launch(server_name="127.0.0.1", server_port=7860, show_api=False, inbrowser=True)
+    demo.launch(server_name="127.0.0.1", server_port=7860, inbrowser=True)
+    demo.launch(server_name="127.0.0.1", server_port=7860, inbrowser=True, css=CSS)
