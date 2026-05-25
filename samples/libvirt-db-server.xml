@@ -1,0 +1,61 @@
+<domain type='kvm'>
+  <name>db-prod-01</name>
+  <uuid>4a8b2c1d-9e3f-4a5b-8c6d-1e2f3a4b5c6d</uuid>
+  <description>Production PostgreSQL 15 primary. Replicates to db-prod-02. Owned by platform-data@example.com.</description>
+  <memory unit='GiB'>64</memory>
+  <currentMemory unit='GiB'>64</currentMemory>
+  <memoryBacking>
+    <hugepages>
+      <page size='1' unit='GiB'/>
+    </hugepages>
+    <locked/>
+  </memoryBacking>
+  <vcpu placement='static' cpuset='8-15'>8</vcpu>
+  <cputune>
+    <vcpupin vcpu='0' cpuset='8'/>
+    <vcpupin vcpu='1' cpuset='9'/>
+  </cputune>
+  <numatune>
+    <memory mode='strict' nodeset='1'/>
+  </numatune>
+  <os>
+    <type arch='x86_64' machine='pc-q35-7.2'>hvm</type>
+    <boot dev='hd'/>
+    <loader readonly='yes' secure='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.secboot.fd</loader>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <ioapic driver='qemu'/>
+  </features>
+  <cpu mode='host-passthrough' check='none' migratable='off'/>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/mapper/vg_db-lv_data'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='/var/lib/libvirt/images/db-prod-01-os.qcow2'/>
+      <target dev='vdb' bus='virtio'/>
+    </disk>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <source>
+        <address domain='0x0000' bus='0x81' slot='0x00' function='0x0'/>
+      </source>
+      <alias name='nvme-passthrough'/>
+    </hostdev>
+    <interface type='direct'>
+      <mac address='52:54:00:aa:bb:cc'/>
+      <source dev='enp3s0f0' mode='passthrough'/>
+      <model type='virtio'/>
+    </interface>
+    <interface type='network'>
+      <mac address='52:54:00:aa:bb:cd'/>
+      <source network='internal-mgmt'/>
+      <model type='virtio'/>
+    </interface>
+  </devices>
+</domain>

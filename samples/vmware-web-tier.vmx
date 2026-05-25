@@ -1,0 +1,38 @@
+.encoding = "UTF-8"
+config.version = "8"
+virtualHW.version = "19"
+displayName = "web-tier-01"
+guestOS = "rhel9-64"
+numvcpus = "4"
+cpuid.coresPerSocket = "2"
+memSize = "8192"
+firmware = "efi"
+uefi.secureBoot.enabled = "TRUE"
+
+scsi0.virtualDev = "pvscsi"
+scsi0.present = "TRUE"
+scsi0:0.fileName = "web-tier-01.vmdk"
+scsi0:0.present = "TRUE"
+scsi0:0.deviceType = "scsi-hardDisk"
+
+ide1:0.deviceType = "cdrom-image"
+ide1:0.fileName = "/vmfs/iso/rhel-9.4.iso"
+
+ethernet0.virtualDev = "vmxnet3"
+ethernet0.networkName = "VLAN-100-DMZ"
+ethernet0.addressType = "generated"
+ethernet0.present = "TRUE"
+
+floppy0.present = "FALSE"
+
+tools.syncTime = "TRUE"
+tools.upgrade.policy = "useGlobal"
+
+snapshot.action = "keep"
+encryption.required = "TRUE"
+encryption.keyId = "vsphere-kms-key-001"
+
+vmotion.cpuCompatibility.enabled = "TRUE"
+ft.allowFt = "FALSE"
+
+annotation = "Production web tier. Nginx + PHP-FPM. Behind F5 VIP 10.20.30.40. Owned by platform-web@example.com"

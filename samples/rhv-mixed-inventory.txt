@@ -1,0 +1,105 @@
+# RHV / oVirt inventory export — datacenter: dc-mum-prod
+# Generated: 2026-05-20T03:14:22Z
+
+cluster: rhv-cluster-prod-01
+compatibility_version: 4.5
+host_count: 6
+storage_domains:
+  - name: nfs-tier1-prod
+    type: nfs
+    capacity_gib: 24576
+  - name: iscsi-tier2-archive
+    type: iscsi
+    capacity_gib: 51200
+  - name: fc-tier0-db
+    type: fibre_channel
+    capacity_gib: 8192
+
+vms:
+  - name: app-tier-01
+    status: up
+    cpu: { cores: 4, sockets: 1, threads: 2 }
+    memory_gib: 16
+    os: rhel9
+    disks:
+      - { name: app-tier-01_Disk1, size_gib: 80, storage: nfs-tier1-prod, interface: virtio_scsi, bootable: true }
+    nics:
+      - { name: nic1, network: vlan100-app, mac: 56:6f:ff:00:00:11, profile: virtio }
+    custom_properties:
+      - timezone=Asia/Kolkata
+      - sla=gold
+
+  - name: app-tier-02
+    status: up
+    cpu: { cores: 4, sockets: 1, threads: 2 }
+    memory_gib: 16
+    os: rhel9
+    disks:
+      - { name: app-tier-02_Disk1, size_gib: 80, storage: nfs-tier1-prod, interface: virtio_scsi, bootable: true }
+    nics:
+      - { name: nic1, network: vlan100-app, mac: 56:6f:ff:00:00:12, profile: virtio }
+
+  - name: cache-redis-01
+    status: up
+    cpu: { cores: 2, sockets: 1, threads: 1 }
+    memory_gib: 32
+    os: rhel9
+    disks:
+      - { name: cache-redis-01_Disk1, size_gib: 40, storage: nfs-tier1-prod, interface: virtio, bootable: true }
+    nics:
+      - { name: nic1, network: vlan110-cache, mac: 56:6f:ff:00:00:21, profile: virtio }
+    huge_pages: 2048
+    custom_properties:
+      - workload=memory_intensive
+
+  - name: db-oracle-01
+    status: up
+    cpu: { cores: 16, sockets: 2, threads: 1 }
+    memory_gib: 128
+    os: oracle_linux_8
+    disks:
+      - { name: db-oracle-01_OS, size_gib: 100, storage: fc-tier0-db, interface: virtio_scsi, bootable: true }
+      - { name: db-oracle-01_DATA, size_gib: 2048, storage: fc-tier0-db, interface: virtio_scsi, bootable: false }
+      - { name: db-oracle-01_REDO, size_gib: 256, storage: fc-tier0-db, interface: virtio_scsi, bootable: false }
+    nics:
+      - { name: nic1, network: vlan120-db, mac: 56:6f:ff:00:00:31, profile: sr-iov }
+    cpu_pinning: "0-15"
+    numa_pinning: node0
+    custom_properties:
+      - sla=platinum
+      - licence=oracle-byol
+      - fips_mode=enabled
+
+  - name: file-share-01
+    status: up
+    cpu: { cores: 2, sockets: 1, threads: 1 }
+    memory_gib: 8
+    os: windows_server_2019
+    disks:
+      - { name: file-share-01_OS, size_gib: 80, storage: nfs-tier1-prod, interface: ide, bootable: true }
+      - { name: file-share-01_DATA, size_gib: 4096, storage: iscsi-tier2-archive, interface: virtio_scsi, bootable: false }
+    nics:
+      - { name: nic1, network: vlan130-corp, mac: 56:6f:ff:00:00:41, profile: e1000 }
+    custom_properties:
+      - guest_agent=installed
+      - antivirus=defender
+
+  - name: legacy-billing
+    status: up
+    cpu: { cores: 2, sockets: 1, threads: 1 }
+    memory_gib: 4
+    os: windows_server_2008_r2
+    disks:
+      - { name: legacy-billing_Disk1, size_gib: 60, storage: nfs-tier1-prod, interface: ide, bootable: true }
+    nics:
+      - { name: nic1, network: vlan130-corp, mac: 56:6f:ff:00:00:51, profile: e1000 }
+    custom_properties:
+      - vendor_support=expired
+      - migration_priority=defer
+
+policies:
+  - affinity_groups:
+      - { name: app-tier-anti-affinity, vms: [app-tier-01, app-tier-02], enforcing: true }
+  - scheduling_policy: power_saving
+  - high_availability:
+      enabled_for: [db-oracle-01, app-tier-01, app-tier-02]

@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+output/*.md
+!output/.gitkeep
+.DS_Store
+.idea/
+.vscode/
